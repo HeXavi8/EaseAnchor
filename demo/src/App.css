@@ -1,0 +1,19 @@
+.anchor {
+  position: fixed;
+  top: 0;
+  right: 0;
+  background: white;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.anchor-item {
+  cursor: pointer;
+  padding: 5px;
+  margin: 5px 0;
+}
+
+.anchor-item.active {
+  font-weight: bold;
+  color: blue;
+}
