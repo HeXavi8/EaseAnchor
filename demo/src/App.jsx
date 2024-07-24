@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import EaseAnchor from './components/Anchor.tsx';
 
 // 定义锚点项
-const items = [
+const items1 = [
   {
     href: 'section1',
     content: (isActive) => <span style={{ color: isActive ? '#94D2EF' : '#355386', fontWeight: isActive ? 'bold' : 'normal' }}>Section 1</span>
@@ -27,22 +27,6 @@ const items = [
   }
 ];
 
-const items2 = [
-  {
-    id: 'section1', label: 'Section 1', children: [
-      { id: 'subsection1', label: 'Subsection 1' },
-      { id: 'subsection2', label: 'Subsection 2' },
-    ]
-  },
-  { id: 'section2', label: 'Section 2' },
-  {
-    id: 'section3', label: 'Section 3', children: [
-      { id: 'subsection3', label: 'Subsection 3' },
-      { id: 'subsection4', label: 'Subsection 4' },
-    ]
-  },
-];
-
 const Demo1 = () => {
   const handleClick = (activeItem, hierarchy) => {
     console.log('Active Item:', activeItem);
@@ -51,7 +35,7 @@ const Demo1 = () => {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px', height: '100vh' }}>
       <EaseAnchor
-        items={items}
+        items={items1}
         scrollContainer="scroll-container"
         offset={50}
         animation={true}
@@ -83,8 +67,76 @@ const Demo1 = () => {
   );
 };
 
+const Demo2 = () => {
+  const items2 = [
+    {
+      href: 'section4',
+      content: (isActive) => <span style={{ color: isActive ? '#94D2EF' : '#355386', fontWeight: isActive ? 'bold' : 'normal' }}>Section 4</span>
+    },
+    {
+      href: 'section5',
+      content: (isActive) => <span style={{ color: isActive ? '#94D2EF' : '#355386', fontWeight: isActive ? 'bold' : 'normal' }}>Section 5</span>,
+      children: [
+        {
+          href: 'section5-1',
+          content: (isActive) => <span style={{ color: isActive ? '#94D2EF' : '#355386', fontWeight: isActive ? 'bold' : 'normal' }}>Section 5-1</span>
+        },
+        {
+          href: 'section5-2',
+          content: (isActive) => <span style={{ color: isActive ? '#94D2EF' : '#355386', fontWeight: isActive ? 'bold' : 'normal' }}>Section 5-2</span>
+        }
+      ]
+    },
+    {
+      href: 'section6',
+      content: (isActive) => <span style={{ color: isActive ? '#94D2EF' : '#355386', fontWeight: isActive ? 'bold' : 'normal' }}>Section 6</span>
+    }
+  ];
+  const handleAnchorClick = (href, hierarchy) => {
+    console.log(`Clicked: ${href}, Hierarchy: ${hierarchy.join(' > ')}`);
+  };
+  return <div className="app">
+    <div className="sidebar" style={{ position: 'fixed', left: 0, top: 600, width: '200px', height: '100vh', overflowY: 'auto' }}>
+      <EaseAnchor
+        items={items2}
+        offset={60}
+        onClick={handleAnchorClick}
+        className="custom-anchor"
+        itemClassName="custom-anchor-item"
+      />
+    </div>
+    <div className="content" style={{ marginLeft: '220px', padding: '20px' }}>
+      <h1>EaseAnchor Demo</h1>
+      <section style={{ height: '200px' }}>
+        <h2 id="section4">Section 4</h2>
+        <p>This is the content of section 4.</p>
+      </section>
+      <section style={{ height: '300px' }}>
+        <h2 id="section5">Section 5</h2>
+        <p>This is the content of section 5.</p>
+        <section style={{ height: '100px' }}>
+          <h3 id="section5-1">Section 5.1</h3>
+          <p>This is the content of section 5-1.</p>
+        </section>
+        <section style={{ height: '100px' }}>
+          <h3 id="section5-2">Section 5-2</h3>
+          <p>This is the content of section 5-2.</p>
+        </section>
+      </section>
+      <section style={{ height: '200px' }}>
+        <h2 id="section6">Section 6</h2>
+        <p>This is the content of section 6.</p>
+      </section>
+      <section style={{ height: '3000px' }}></section>
+    </div>
+  </div>
+}
+
 function App() {
-  return <Demo1></Demo1>
+  return <>
+    <Demo1></Demo1>
+    <Demo2></Demo2>
+  </>
 }
 
 export default App;
