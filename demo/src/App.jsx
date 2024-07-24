@@ -103,6 +103,7 @@ const Demo2 = () => {
         onClick={handleAnchorClick}
         className="custom-anchor"
         itemClassName="custom-anchor-item"
+        defaultValue='section5-2'
       />
     </div>
     <div className="content" style={{ marginLeft: '220px', padding: '20px' }}>
@@ -115,7 +116,7 @@ const Demo2 = () => {
         <h2 id="section5">Section 5</h2>
         <p>This is the content of section 5.</p>
         <section style={{ height: '100px' }}>
-          <h3 id="section5-1">Section 5.1</h3>
+          <h3 id="section5-1">Section 5-1</h3>
           <p>This is the content of section 5-1.</p>
         </section>
         <section style={{ height: '100px' }}>

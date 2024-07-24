@@ -175,7 +175,7 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
         if (targetElement && containerRef.current) {
           const containerTop =
             containerRef.current instanceof Window
-              ? window.scrollY
+              ? 0
               : containerRef.current.getBoundingClientRect().top;
           const targetTop = targetElement.getBoundingClientRect().top;
           const targetScrollTop =

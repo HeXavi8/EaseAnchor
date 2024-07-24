@@ -26,7 +26,11 @@ interface AnchorLinkProps {
   item: AnchorItem;
   level: number;
   hierarchy: string[];
-  handleClick: (e: React.MouseEvent<HTMLElement>, href: string, hierarchy: string[]) => void;
+  handleClick: (
+    e: React.MouseEvent<HTMLElement>,
+    href: string,
+    hierarchy: string[],
+  ) => void;
   activeHref: string;
   itemClassName?: string;
   itemStyle?: React.CSSProperties;
@@ -128,7 +132,7 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
     };
 
     findTopVisibleItem(items, []);
-    return topVisibleItem;
+    return topVisibleItem
   };
 
   const handleScroll = useCallback(() => {
@@ -137,7 +141,7 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
     if (result && result.href !== activeHref) {
       setActiveHref(result.href);
     }
-  }, [items, offset, activeHref]);
+  }, [items, activeHref]);
 
   const setupScrollListener = () => {
     try {
@@ -171,7 +175,7 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
         if (targetElement && containerRef.current) {
           const containerTop =
             containerRef.current instanceof Window
-              ? window.scrollY
+              ? 0
               : containerRef.current.getBoundingClientRect().top;
           const targetTop = targetElement.getBoundingClientRect().top;
           const targetScrollTop =
@@ -227,7 +231,7 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
         }
       }
     },
-    [offset, animation, onClick, items],
+    [offset, animation, onClick],
   );
 
   return (
