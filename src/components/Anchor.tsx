@@ -21,8 +21,33 @@ interface EaseAnchorProps {
   defaultValue?: string;
 }
 
+// 定义组件的props接口
+interface AnchorLinkProps {
+  item: AnchorItem;
+  level: number;
+  hierarchy: string[];
+  handleClick: (e: React.MouseEvent<HTMLElement>, href: string, hierarchy: string[]) => void;
+  activeHref: string;
+  itemClassName?: string;
+  itemStyle?: React.CSSProperties;
+}
+
+interface TopVisibleItem {
+  href: string;
+  hierarchy: string[];
+  top: number;
+}
+
 // AnchorLink 子组件
-export const AnchorLink = ({ item, level, hierarchy, handleClick, activeHref, itemClassName, itemStyle }) => {
+export const AnchorLink: React.FC<AnchorLinkProps> = ({
+  item,
+  level,
+  hierarchy,
+  handleClick,
+  activeHref,
+  itemClassName,
+  itemStyle,
+}) => {
   const targetHref = item.href;
   const currentHierarchy = [...hierarchy, targetHref];
   return (
@@ -32,18 +57,19 @@ export const AnchorLink = ({ item, level, hierarchy, handleClick, activeHref, it
           ? item.content(activeHref === targetHref, level)
           : item.content}
       </div>
-      {item.children && item.children.map(child => (
-        <AnchorLink
-          key={child.href}
-          item={child}
-          level={level + 1}
-          hierarchy={currentHierarchy}
-          handleClick={handleClick}
-          activeHref={activeHref}
-          itemClassName={itemClassName}
-          itemStyle={itemStyle}
-        />
-      ))}
+      {item.children &&
+        item.children.map((child) => (
+          <AnchorLink
+            key={child.href}
+            item={child}
+            level={level + 1}
+            hierarchy={currentHierarchy}
+            handleClick={handleClick}
+            activeHref={activeHref}
+            itemClassName={itemClassName}
+            itemStyle={itemStyle}
+          />
+        ))}
     </div>
   );
 };
@@ -75,18 +101,23 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
     setActiveHref(getInitialActiveHref());
   }, [getInitialActiveHref]);
 
-  const findTopVisibleHrefInItems = (items: AnchorItem[], offset: number): { href: string, hierarchy: string[] } | null => {
-    let topVisibleItem: { href: string, hierarchy: string[], top: number } | null = null;
+  const findTopVisibleHrefInItems = (
+    items: AnchorItem[],
+  ): { href: string; hierarchy: string[] } | null => {
+    let topVisibleItem: TopVisibleItem | null = null;
 
     const findTopVisibleItem = (items: AnchorItem[], hierarchy: string[]): void => {
-      items.forEach(item => {
+      items.forEach((item) => {
         const targetHref = item.href;
         const targetElement = document.getElementById(targetHref);
         if (targetElement && containerRef.current) {
-          const containerTop = containerRef.current instanceof Window ? 0 : containerRef.current.getBoundingClientRect().top;
+          const containerTop =
+            containerRef.current instanceof Window
+              ? 0
+              : containerRef.current.getBoundingClientRect().top;
           const targetTop = targetElement.getBoundingClientRect().top;
           const top = targetTop - containerTop;
-          if (top >= 0 && (!topVisibleItem || top < topVisibleItem.top)) {
+          if (top >= 0 && (!topVisibleItem || top < topVisibleItem?.top)) {
             topVisibleItem = { href: targetHref, hierarchy: [...hierarchy, targetHref], top };
           }
           if (item.children) {
@@ -97,12 +128,12 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
     };
 
     findTopVisibleItem(items, []);
-    return topVisibleItem ? { href: topVisibleItem.href, hierarchy: topVisibleItem.hierarchy } : null;
+    return topVisibleItem;
   };
 
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return;
-    const result = findTopVisibleHrefInItems(items, offset);
+    const result = findTopVisibleHrefInItems(items);
     if (result && result.href !== activeHref) {
       setActiveHref(result.href);
     }
@@ -110,9 +141,10 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
 
   const setupScrollListener = () => {
     try {
-      const container = typeof scrollContainer === 'string'
-        ? document.getElementById(scrollContainer)
-        : scrollContainer || window;
+      const container =
+        typeof scrollContainer === 'string'
+          ? document.getElementById(scrollContainer)
+          : scrollContainer || window;
 
       containerRef.current = container as HTMLElement;
 
@@ -137,14 +169,20 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
       if (targetHref) {
         const targetElement = document.getElementById(targetHref);
         if (targetElement && containerRef.current) {
-          const containerTop = containerRef.current instanceof Window ? window.scrollY : containerRef.current.getBoundingClientRect().top;
+          const containerTop =
+            containerRef.current instanceof Window
+              ? window.scrollY
+              : containerRef.current.getBoundingClientRect().top;
           const targetTop = targetElement.getBoundingClientRect().top;
-          const targetScrollTop = containerRef.current instanceof Window ? window.scrollY : containerRef.current.scrollTop
+          const targetScrollTop =
+            containerRef.current instanceof Window
+              ? window.scrollY
+              : containerRef.current.scrollTop;
           const targetPosition = targetTop - containerTop + targetScrollTop - offset;
           if (animation) {
             containerRef.current.scrollTo({
               top: targetPosition,
-              behavior: 'smooth'
+              behavior: 'smooth',
             });
           } else {
             containerRef.current.scrollTo(0, targetPosition);
@@ -161,33 +199,40 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
     initialScrollToTarget();
   }, [scrollContainer, handleScroll, getInitialActiveHref, offset, animation]);
 
-  const handleClick = useCallback((e: React.MouseEvent<HTMLElement>, href: string, hierarchy: string[]) => {
-    e.preventDefault();
-    const targetHref = href;
-    const targetElement = document.getElementById(targetHref);
-    if (targetElement && containerRef.current) {
-      const containerTop = containerRef.current instanceof Window ? 0 : containerRef.current.getBoundingClientRect().top;
-      const targetTop = targetElement.getBoundingClientRect().top;
-      const targetScrollTop = containerRef.current instanceof Window ? window.scrollY : containerRef.current.scrollTop
-      const targetPosition = targetTop - containerTop + targetScrollTop - offset;
-      if (animation) {
-        containerRef.current.scrollTo({
-          top: targetPosition,
-          behavior: 'smooth'
-        });
-      } else {
-        containerRef.current.scrollTo(0, targetPosition);
-      }
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLElement>, href: string, hierarchy: string[]) => {
+      e.preventDefault();
+      const targetHref = href;
+      const targetElement = document.getElementById(targetHref);
+      if (targetElement && containerRef.current) {
+        const containerTop =
+          containerRef.current instanceof Window
+            ? 0
+            : containerRef.current.getBoundingClientRect().top;
+        const targetTop = targetElement.getBoundingClientRect().top;
+        const targetScrollTop =
+          containerRef.current instanceof Window ? window.scrollY : containerRef.current.scrollTop;
+        const targetPosition = targetTop - containerTop + targetScrollTop - offset;
+        if (animation) {
+          containerRef.current.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth',
+          });
+        } else {
+          containerRef.current.scrollTo(0, targetPosition);
+        }
 
-      if (onClick) {
-        onClick(href, hierarchy);
+        if (onClick) {
+          onClick(href, hierarchy);
+        }
       }
-    }
-  }, [offset, animation, onClick, items]);
+    },
+    [offset, animation, onClick, items],
+  );
 
   return (
     <nav className={`ease-anchor ${className}`} style={style}>
-      {items.map(item => (
+      {items.map((item) => (
         <AnchorLink
           key={item.href}
           item={item}
