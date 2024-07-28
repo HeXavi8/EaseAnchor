@@ -1,5 +1,7 @@
 # EaseAnchor
 
+[中文文档](./README-CN.md)
+
 EaseAnchor is a flexible React anchor navigation component that provides easy-to-use in-page navigation functionality. It supports multi-level nested anchor structures, customizable scroll containers and styles, and offers both smooth scrolling and instant jump modes. (Currently in beta version)
 
 ## Features
