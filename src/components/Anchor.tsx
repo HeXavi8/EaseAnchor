@@ -1,27 +1,43 @@
 import React, { useState, useEffect, useRef, ReactNode, useCallback, CSSProperties } from 'react';
 
 // 定义 AnchorItem 接口
+// Define AnchorItem interface
 interface AnchorItem {
   href: string;
+  // 锚点的目标 ID / Target ID for the anchor
   content: ReactNode | ((isActive: boolean, level: number) => ReactNode);
+  // 锚点的显示内容 / Content to display for the anchor
   children?: AnchorItem[];
+  // 可选的子锚点项 / Optional child anchor items
 }
 
 // 定义 EaseAnchorProps 接口
+// Define EaseAnchorProps interface
 interface EaseAnchorProps {
   items: AnchorItem[];
+  // 锚点项数组 / Array of anchor items
   scrollContainer?: string | HTMLElement;
+  // 滚动容器 / Scroll container
   offset?: number;
+  // 滚动偏移量 / Scroll offset
   animation?: boolean;
+  // 是否使用平滑滚动 / Whether to use smooth scrolling
   onClick?: (href: string, hierarchy: string[]) => void;
+  // 点击回调 / Click callback
   className?: string;
+  // 自定义类名 / Custom class name
   style?: CSSProperties;
+  // 自定义样式 / Custom style
   itemClassName?: string;
+  // 锚点项自定义类名 / Custom class name for anchor items
   itemStyle?: CSSProperties;
+  // 锚点项自定义样式 / Custom style for anchor items
   defaultValue?: string;
+  // 默认激活的锚点 / Default active anchor
 }
 
-// 定义组件的props接口
+// 定义 AnchorLink 组件的 props 接口
+// Define props interface for AnchorLink component
 interface AnchorLinkProps {
   item: AnchorItem;
   level: number;
@@ -43,6 +59,7 @@ interface TopVisibleItem {
 }
 
 // AnchorLink 子组件
+// AnchorLink subcomponent
 export const AnchorLink: React.FC<AnchorLinkProps> = ({
   item,
   level,
@@ -78,7 +95,8 @@ export const AnchorLink: React.FC<AnchorLinkProps> = ({
   );
 };
 
-// EaseAnchor 组件
+// EaseAnchor 主组件
+// EaseAnchor main component
 const EaseAnchor: React.FC<EaseAnchorProps> = ({
   items,
   scrollContainer,
@@ -95,6 +113,8 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
   const containerRef = useRef<HTMLElement | null>(null);
   const initialScrollDone = useRef<boolean>(false);
 
+  // 获取初始活动锚点
+  // Get initial active anchor
   const getInitialActiveHref = useCallback(() => {
     if (defaultValue) return defaultValue;
     const hash = window.location.hash.slice(1);
@@ -105,6 +125,8 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
     setActiveHref(getInitialActiveHref());
   }, [getInitialActiveHref]);
 
+  // 查找当前可见的顶部锚点
+  // Find the top visible anchor
   const findTopVisibleHrefInItems = (
     items: AnchorItem[],
   ): { href: string; hierarchy: string[] } | null => {
@@ -135,6 +157,8 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
     return topVisibleItem
   };
 
+  // 处理滚动事件
+  // Handle scroll event
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return;
     const result = findTopVisibleHrefInItems(items);
@@ -143,6 +167,8 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
     }
   }, [items, activeHref]);
 
+  // 设置滚动监听器
+  // Set up scroll listener
   const setupScrollListener = () => {
     try {
       const container =
@@ -167,6 +193,8 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
     }
   };
 
+  // 初始滚动到目标位置
+  // Initial scroll to target position
   const initialScrollToTarget = () => {
     if (!initialScrollDone.current && containerRef.current) {
       const targetHref = getInitialActiveHref();
@@ -203,6 +231,8 @@ const EaseAnchor: React.FC<EaseAnchorProps> = ({
     initialScrollToTarget();
   }, [scrollContainer, handleScroll, getInitialActiveHref, offset, animation]);
 
+  // 处理锚点点击事件
+  // Handle anchor click event
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLElement>, href: string, hierarchy: string[]) => {
       e.preventDefault();
